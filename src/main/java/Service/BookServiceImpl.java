@@ -1,17 +1,20 @@
 package Service;
 
 import Model.Book;
+import Model.Sale;
 import Repository.BookRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.*;
 
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final List<Sale> sales;
 
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
+        this.sales = new ArrayList<>();
     }
 
     @Override
@@ -20,9 +23,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Sale> findAllSale() {return bookRepository.findAllSale();}
+
+    @Override
+    public boolean ifBookIsPresent(String title) {
+        return bookRepository.ifBookIsPresent(title);
+    }
+
+    @Override
     public Book findByTitle(String title) {
         return bookRepository.findByTitle(title)
-                .orElseThrow(() -> new IllegalArgumentException("Sale with title: %s was not found".formatted(title)));
+                .orElseThrow(() -> new IllegalArgumentException("Book with title: %s was not found".formatted(title)));
     }
 
     @Override
@@ -32,8 +43,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean updateAmount(String title, int newAmount){
-        return bookRepository.updateAmount(title, newAmount);
+    public boolean updateAmount(String title, int newAmount, int quantity, double price){
+        return bookRepository.updateAmount(title, newAmount, quantity, price);
     }
 
     @Override
@@ -53,4 +64,20 @@ public class BookServiceImpl implements BookService {
 
         return (int) ChronoUnit.YEARS.between(book.getPublishedDate(), now);
     }
+
+//    @Override
+//    public boolean sellBook(String title, int quantity, double price) {
+//        Book book = this.findByTitle(title);
+//        if (book != null && book.getTitle().equals(title)) {
+//            Sale sale = new Sale();
+//            sale.setBookTitle(title);
+//            sale.setQuantity(quantity);
+//            sale.setTotalPrice(price);
+//            sales.add(sale);
+//
+//            bookRepository.updateAmount(title, book.getAmount() - quantity);
+//            return true;
+//        }
+//        return false;
+//    }
 }

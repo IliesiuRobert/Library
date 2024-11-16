@@ -70,13 +70,4 @@ public class BookDTO {
         }
         return price;
     }
-
-    public boolean sellBook(int quantity) {
-        if (getAmount() >= quantity) {
-            setAmount(getAmount() - quantity);
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

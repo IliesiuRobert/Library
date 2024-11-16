@@ -13,12 +13,8 @@ import Mapper.BookMapper;
 import Mapper.SaleMapper;
 import Repository.BookRepository;
 import Repository.BookRepositoryMySQL;
-import Repository.SaleRepository;
-import Repository.SaleRepositoryMySQL;
 import Service.BookService;
 import Service.BookServiceImpl;
-import Service.SaleService;
-import Service.SaleServiceImpl;
 import View.BookView;
 import View.Model.BookDTO;
 import View.Model.SaleDTO;
@@ -31,9 +27,7 @@ public class ComponentFactory {
     private final BookView bookView;
     private final BookController bookController;
     private final BookRepository bookRepository;
-    private final SaleRepository saleRepository;
     private final BookService bookService;
-    private final SaleService saleService;
     private static ComponentFactory instance;
 
     // Metoda statica ca sa obtinem instanta unica
@@ -49,16 +43,14 @@ public class ComponentFactory {
     private ComponentFactory(Boolean componentsForTest, Stage stage) {
         Connection connection = DatabaseConnectionFactory.getConnectionWrapper(componentsForTest).getConnection();
         this.bookRepository = new BookRepositoryMySQL(connection);
-        this.saleRepository = new SaleRepositoryMySQL(connection);
 
         this.bookService = new BookServiceImpl(bookRepository);
-        this.saleService = new SaleServiceImpl(saleRepository);
 
         List<BookDTO> bookDTOs = BookMapper.convertBookListToBookDTOList(this.bookService.findAll());
-        List<SaleDTO> saleDTOS = SaleMapper.convertSaleListToSaleDTOList(this.saleRepository.findAllSale());
+        List<SaleDTO> saleDTOs = SaleMapper.convertSaleListToSaleDTOList(this.bookService.findAllSale());
 
-        this.bookView = new BookView(stage, bookDTOs, saleDTOS);
-        this.bookController = new BookController(bookView, bookService, saleService);
+        this.bookView = new BookView(stage, bookDTOs, saleDTOs);
+        this.bookController = new BookController(bookView, bookService);
     }
 
     // Getter pentru componentele interne
@@ -76,13 +68,5 @@ public class ComponentFactory {
 
     public BookService getBookService() {
         return bookService;
-    }
-
-    public SaleRepository getSaleRepository() {
-        return saleRepository;
-    }
-
-    public SaleService getSaleService() {
-        return saleService;
     }
 }

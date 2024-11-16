@@ -38,7 +38,6 @@ public class BookView {
     private Button saveButton;
     private Button deleteButton;
     private Button saleButton;
-    private Button saveOrderButton;
 
     public BookView(Stage primaryStage, List<BookDTO> bookDTOS, List<SaleDTO> saleDTOS) {
         primaryStage.setTitle("Library");
@@ -149,8 +148,6 @@ public class BookView {
         saleButton = new Button("Sale");
         gridPane.add(saleButton, 3, 2);
 
-        saveOrderButton = new Button("Order");
-        gridPane.add(saveOrderButton, 4, 2);
     }
 
     private void initializeGridPane(GridPane gridPane){
@@ -168,20 +165,12 @@ public class BookView {
         bookTableView.getSelectionModel().selectedItemProperty().addListener(selectionTableListener);
     }
 
-//    public void addSelectionTableOrderListener(ChangeListener selectionTableListener){
-//        bookTableView.getSelectionModel().selectedItemProperty().addListener(selectionTableListener);
-//    }
-
     public void addDeleteButtonListener(EventHandler<ActionEvent> deleteButtonListener){
         deleteButton.setOnAction(deleteButtonListener);
     }
 
     public void addSaleButtonListener(EventHandler<ActionEvent> saleButtonListener){
         saleButton.setOnAction(saleButtonListener);
-    }
-
-    public void addOrderButtonListener(EventHandler<ActionEvent> addOrderButtonListener){
-        saveOrderButton.setOnAction(addOrderButtonListener);
     }
 
     public void displayAlertMessage(String titleInformation, String headerInformation, String contextInformation){
@@ -214,7 +203,16 @@ public class BookView {
     }
 
     public int getSaleQuantity() {
-        return Integer.parseInt(saleQuantityTextField.getText());
+        //return Integer.parseInt(saleQuantityTextField.getText());
+        String quantityText = saleQuantityTextField.getText();
+        if (quantityText == null || quantityText.trim().isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(quantityText);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public ObservableList<BookDTO> getBooksObservableList(){
@@ -227,6 +225,15 @@ public class BookView {
 
     public void addBookToObservableList(BookDTO bookDTO){
         this.booksObservableList.add(bookDTO);
+    }
+
+    public void updateBookToObservabileList(BookDTO bookDTO) {
+        for (int i = 0; i < booksObservableList.size(); i++) {
+            if (booksObservableList.get(i).getTitle().equals(bookDTO.getTitle())) {
+                booksObservableList.set(i, bookDTO);
+                break;
+            }
+        }
     }
 
     public void removeBookFromObservableList(BookDTO bookDTO){

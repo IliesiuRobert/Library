@@ -1,6 +1,7 @@
 package Repository;
 
 import Model.Book;
+import Model.Sale;
 
 import java.sql.*;
 import java.sql.Date;
@@ -57,6 +58,26 @@ public class BookRepositoryMySQL implements BookRepository {
         return books;
     }
 
+    @Override
+    public boolean ifBookIsPresent(String title) {
+        String sql = "SELECT * FROM book WHERE title=?;";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, title);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
     public Optional<Book> findByTitle(String title1) {
         String sql = "SELECT * FROM book WHERE title = ?";
 
@@ -134,8 +155,9 @@ public class BookRepositoryMySQL implements BookRepository {
     }
 
     @Override
-    public boolean updateAmount(String title, int newAmount) {
+    public boolean updateAmount(String title, int newAmount, int quantity, double price) {
         String sql = "UPDATE book SET amount = ? WHERE title = ?";
+        String newsql = "INSERT INTO sale VALUES(null,?,?,?);";
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -143,11 +165,52 @@ public class BookRepositoryMySQL implements BookRepository {
             preparedStatement.setString(2, title);
 
             int rowsUpdated = preparedStatement.executeUpdate();
-            return rowsUpdated == 1;
+
+            PreparedStatement preparedStatement1 = connection.prepareStatement(newsql);
+            preparedStatement1.setString(1, title);
+            preparedStatement1.setInt(2, quantity);
+            preparedStatement1.setDouble(3, price);
+
+            int rowsUpdated1 = preparedStatement1.executeUpdate();
+
+            return rowsUpdated == 1 && rowsUpdated1 == 1;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public List<Sale> findAllSale() {
+        String sql = "SELECT * FROM sale;";
+
+        List<Sale> sales = new ArrayList<>();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()){
+                Long id = resultSet.getLong("id");
+                String booktitle = resultSet.getString("title");
+                int quantity = resultSet.getInt("quantity");
+                double price = resultSet.getDouble("price");
+
+                Sale sale = new Sale();
+
+                sale.setId(id);
+                sale.setBookTitle(booktitle);
+                sale.setQuantity(quantity);
+                sale.setTotalPrice(price);
+
+                sales.add(sale);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return sales;
     }
 
     @Override
@@ -210,7 +273,6 @@ public class BookRepositoryMySQL implements BookRepository {
             e.printStackTrace();
         }
     }
-
 
 //    private Book getBookFromResultSet(ResultSet resultSet) throws SQLException {
 //        return new BookBuilder()
