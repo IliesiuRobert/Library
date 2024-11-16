@@ -1,14 +1,17 @@
 package Repository;
 
 import Model.Book;
+import Model.Sale;
 
 import java.util.*;
 
 public class BookRepositoryMock implements BookRepository {
     private final List<Book> books;
+    private final List<Sale> sales;
 
     public BookRepositoryMock() {
         books = new ArrayList<>();
+        sales = new ArrayList<>();
     }
 
     @Override
@@ -16,6 +19,23 @@ public class BookRepositoryMock implements BookRepository {
         return books;
     }
 
+    @Override
+    public List<Sale> findAllSale() {
+        return sales;
+    }
+
+    @Override
+    public boolean ifBookIsPresent(String title) {
+        Optional<Book> book = books.stream().filter(b -> b.getTitle().equals(title)).findFirst();
+
+        if (book.isPresent()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public Optional<Book> findByTitle(String title) {
         return books.parallelStream()
                 .filter(it -> it.getTitle().equals(title))
@@ -30,7 +50,7 @@ public class BookRepositoryMock implements BookRepository {
     }
 
     @Override
-    public boolean updateAmount(String title, int newAmount) {
+    public boolean updateAmount(String title, int newAmount, int quantity, double price) {
         Optional<Book> bookFind = books.parallelStream()
                 .filter(It -> It.getTitle().equals(title))
                 .findFirst();

@@ -1,10 +1,8 @@
 package Controller;
 
 import Mapper.BookMapper;
-import Mapper.SaleMapper;
 import Model.Book;
 import Service.BookService;
-import Service.SaleService;
 import View.BookView;
 import View.Model.BookDTO;
 import View.Model.Builder.BookDTOBuilder;
@@ -18,19 +16,15 @@ import javafx.event.EventHandler;
 public class BookController {
     private final BookView bookView;
     private final BookService bookService;
-    private final SaleService saleService;
 
-    public BookController(BookView bookView, BookService bookService, SaleService saleService) {
+    public BookController(BookView bookView, BookService bookService) {
         this.bookView = bookView;
         this.bookService = bookService;
-        this.saleService = saleService;
 
         this.bookView.addSaveButtonListener(new SaveButtonListener());
         this.bookView.addSelectionTableListener(new SelectionTableListener());
         this.bookView.addDeleteButtonListener(new DeleteButtonListener());
         this.bookView.addSaleButtonListener(new SaleButtonListener());
-        this.bookView.addOrderButtonListener(new SaveOrderButtonListener());
-        //this.bookView.addSelectionTableOrderListener(new SelectionTableOrderListener());
     }
 
     private class SaveButtonListener implements EventHandler<ActionEvent> {
@@ -72,18 +66,6 @@ public class BookController {
         }
     }
 
-//    private class SelectionTableOrderListener implements ChangeListener {
-//
-//        @Override
-//        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-//            SaleDTO selectedSaleDTO = (SaleDTO) newValue;
-//
-//            if (selectedSaleDTO != null) {
-//                System.out.println("Sale Tile: " + selectedSaleDTO.getBookTitle() + " Quantity: " + selectedSaleDTO.getQuantity());
-//            }
-//        }
-//    }
-
     private class DeleteButtonListener implements EventHandler<ActionEvent> {
 
         @Override
@@ -103,65 +85,53 @@ public class BookController {
         }
     }
 
-    private class SaveOrderButtonListener implements EventHandler<ActionEvent> {
+    private class SaleButtonListener implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent event) {
             String bookTitle = bookView.getSaleTitleBook();
             Integer quantity = bookView.getSaleQuantity();
 
-            if (bookTitle.isEmpty() || quantity == null ){
-                bookView.displayAlertMessage("Save Error", "Problem at fields title, quantity, price", "Can not have empty Title, 0 quantity or null price. Please fill in the fields before submitting!");
+            if (bookTitle.isEmpty() || quantity == 0) {
+                bookView.displayAlertMessage("Error", "Problem at fields title, quantity", "Can not have empty Title or quantity.");
                 bookView.getSaleObservableList().get(0).setBookTitle("No Name");
             } else {
-                Book book = bookService.findByTitle(bookTitle);
+                boolean findSuccessfull = bookService.ifBookIsPresent(bookTitle);
 
-                if (book != null){
-                    SaleDTO saleDTO = new SaleDTOBuilder().setBookTitle(bookTitle).setQuantity(quantity).setTotalPrice(quantity * book.getPrice()).build();
-                    boolean savedSale = saleService.saveSale(SaleMapper.convertSaleDTOToSale(saleDTO));
+                if (findSuccessfull) {
+                    Book book = bookService.findByTitle(bookTitle);
+                    BookDTO bookDTO = BookMapper.convertBookToBookDTO(book);
 
-                    if (savedSale) {
-                        bookView.displayAlertMessage("Save Successful", "Order Added", "Order was successfully added to the database.");
-                        bookView.addSaleToObservableList(saleDTO);
-                    } else {
-                        bookView.displayAlertMessage("Save Not Successful", "Order was not added", "There was a problem at adding the order into the database.");
-                    }
-                } else {
-                    bookView.displayAlertMessage("Save Not Successful", "Order was not added", "Title can not find in books table!");
-                }
-            }
-        }
-    }
+                    int newAmount = bookDTO.getAmount() - quantity;
+                    boolean actionModifiy = bookService.updateAmount(bookDTO.getTitle(), newAmount, quantity, bookDTO.getPrice() * quantity);
 
-    private class SaleButtonListener implements EventHandler<ActionEvent> {
+                    SaleDTO saleDTO = new SaleDTOBuilder()
+                            .setBookTitle(bookTitle)
+                            .setQuantity(quantity)
+                            .setTotalPrice(quantity * bookDTO.getPrice())
+                            .build();
 
-        @Override
-        public void handle(ActionEvent event) {
-            BookDTO bookDTO = (BookDTO) bookView.getBookTableView().getSelectionModel().getSelectedItem();
-            SaleDTO saleDTO = (SaleDTO) bookView.getSaleTableView().getSelectionModel().getSelectedItem();
+                    bookView.addSaleToObservableList(saleDTO);
 
-            if (bookDTO != null && saleDTO != null && bookDTO.getTitle().equals(saleDTO.getBookTitle())){
-                int value = bookDTO.getAmount() - saleDTO.getQuantity();
-                bookDTO.sellBook(saleDTO.getQuantity());
-                bookService.updateAmount(bookDTO.getTitle(), value);
-                boolean deletionSuccessfull = saleService.deleteSale(SaleMapper.convertSaleDTOToSale(saleDTO));
+                    if (actionModifiy) {
+                        bookView.displayAlertMessage("Order Finish", "Order was procesed", "Order was procesesd from database.");
+                        bookDTO.setAmount(newAmount);
+                        bookView.updateBookToObservabileList(bookDTO);
 
-                if (deletionSuccessfull){
-                    bookView.displayAlertMessage("Order Finish", "Order was procesed", "Order was procesesd from database.");
-                    bookView.removeSaleFromObservableList(saleDTO);
-
-                    if (bookDTO.getAmount() == 0) {
-                        boolean succ = bookService.delete(BookMapper.convertBookDTOToBook(bookDTO));
-                        if (succ) {
-                            bookView.displayAlertMessage("Book eliminated", "Book Deleted", "Book was deleted from database because of amount value (amount = 0)!");
-                            bookView.removeBookFromObservableList(bookDTO);
+                        if (bookDTO.getAmount() == 0) {
+                            boolean succ = bookService.delete(BookMapper.convertBookDTOToBook(bookDTO));
+                            if (succ) {
+                                bookView.displayAlertMessage("Book eliminated", "Book Deleted", "Book was deleted from database because of amount value (amount = 0)!");
+                                bookView.removeBookFromObservableList(bookDTO);
+                            }
                         }
+                    } else {
+                        bookView.displayAlertMessage("Order Error", "Order was not procesed", "There was a problem in the book process. Please restart the application and try again!");
                     }
                 } else {
-                    bookView.displayAlertMessage("Deletion not successful", "Deletion Process", "There was a problem in the deletion process. Please restart the application and try again!");
+                    bookView.displayAlertMessage("Order Error", "Book not found", "Book was not fount in database.");
                 }
-            } else {
-                bookView.displayAlertMessage("Deletion not successful", "Deletion Process", "You need to select a row from table before pressing the delete button!");
             }
         }
     }
 }
+
