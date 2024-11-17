@@ -1,8 +1,8 @@
-package Service;
+package Service.Book;
 
 import Model.Book;
 import Model.Sale;
-import Repository.BookRepository;
+import Repository.Book.BookRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

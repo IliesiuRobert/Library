@@ -1,20 +1,20 @@
-package Repository;
+package Service.Book;
 
 import Model.Book;
 import Model.Sale;
 
 import java.util.*;
 
-public interface BookRepository {
+public interface BookService {
     List<Book> findAll();
 
     List<Sale> findAllSale();
 
     boolean ifBookIsPresent(String title);
 
-    Optional<Book> findByTitle(String title);
+    Book findByTitle(String title);
 
-    Optional<Book> findById(Long id);
+    Book findById(Long id);
 
     boolean updateAmount(String title, int amount, int quantity, double price);
 
@@ -22,5 +22,7 @@ public interface BookRepository {
 
     boolean delete(Book book);
 
-    void removeAll();
+    int getAgeOfBook(Long id);
+
+    //boolean sellBook(String title, int amount, double price);
 }
