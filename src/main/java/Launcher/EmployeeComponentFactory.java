@@ -11,10 +11,10 @@ import Controller.BookController;
 import Database.DatabaseConnectionFactory;
 import Mapper.BookMapper;
 import Mapper.SaleMapper;
-import Repository.BookRepository;
-import Repository.BookRepositoryMySQL;
-import Service.BookService;
-import Service.BookServiceImpl;
+import Repository.Book.BookRepository;
+import Repository.Book.BookRepositoryMySQL;
+import Service.Book.BookService;
+import Service.Book.BookServiceImpl;
 import View.BookView;
 import View.Model.BookDTO;
 import View.Model.SaleDTO;
@@ -23,24 +23,24 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.util.*;
 
-public class ComponentFactory {
+public class EmployeeComponentFactory {
     private final BookView bookView;
     private final BookController bookController;
     private final BookRepository bookRepository;
     private final BookService bookService;
-    private static ComponentFactory instance;
+    private static EmployeeComponentFactory instance;
 
     // Metoda statica ca sa obtinem instanta unica
-    public static synchronized ComponentFactory getInstance(Boolean componentsForTest, Stage stage) {
+    public static synchronized EmployeeComponentFactory getInstance(Boolean componentsForTest, Stage stage) {
         if (instance == null) {
-            instance = new ComponentFactory(componentsForTest, stage);
+            instance = new EmployeeComponentFactory(componentsForTest, stage);
         }
 
         return instance;
     }
 
     // Constructor privat
-    private ComponentFactory(Boolean componentsForTest, Stage stage) {
+    private EmployeeComponentFactory(Boolean componentsForTest, Stage stage) {
         Connection connection = DatabaseConnectionFactory.getConnectionWrapper(componentsForTest).getConnection();
         this.bookRepository = new BookRepositoryMySQL(connection);
 

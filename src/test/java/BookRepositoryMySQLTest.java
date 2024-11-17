@@ -1,8 +1,8 @@
 import Database.DatabaseConnectionFactory;
 import Model.Book;
 import Model.Builder.BookBuilder;
-import Repository.BookRepository;
-import Repository.BookRepositoryMySQL;
+import Repository.Book.BookRepository;
+import Repository.Book.BookRepositoryMySQL;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package Controller;
 
 import Mapper.BookMapper;
 import Model.Book;
-import Service.BookService;
+import Service.Book.BookService;
 import View.BookView;
 import View.Model.BookDTO;
 import View.Model.Builder.BookDTOBuilder;

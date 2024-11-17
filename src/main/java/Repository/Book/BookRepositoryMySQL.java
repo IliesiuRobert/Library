@@ -1,4 +1,4 @@
-package Repository;
+package Repository.Book;
 
 import Model.Book;
 import Model.Sale;
