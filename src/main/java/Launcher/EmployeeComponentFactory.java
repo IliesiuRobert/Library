@@ -31,9 +31,13 @@ public class EmployeeComponentFactory {
     private static EmployeeComponentFactory instance;
 
     // Metoda statica ca sa obtinem instanta unica
-    public static synchronized EmployeeComponentFactory getInstance(Boolean componentsForTest, Stage stage) {
+    public static EmployeeComponentFactory getInstance(Boolean componentsForTest, Stage stage) {
         if (instance == null) {
-            instance = new EmployeeComponentFactory(componentsForTest, stage);
+            synchronized(EmployeeComponentFactory.class) {
+                if (instance == null) {
+                    instance = new EmployeeComponentFactory(componentsForTest, stage);
+                }
+            }
         }
 
         return instance;

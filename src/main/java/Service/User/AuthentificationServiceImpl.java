@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Collections;
 
-import static Database.Constants.Roles.CUSTOMER;
+import static Database.Constants.Roles.*;
 
 public class AuthentificationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
@@ -58,6 +58,40 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public Notification<Boolean> registerEmployee(String username, String password){
+        Notification<Boolean> userRegisterNotification = new Notification<>();
+        if(userRepository.existsByUsername(username)) {
+            userRegisterNotification.addError(username + " already exists");
+            userRegisterNotification.setResult(Boolean.FALSE);
+            return userRegisterNotification;
+        }
+
+        Role role = rightsRolesRepository.findRoleByTitle(EMPLOYEE);
+
+        User user = new UserBuilder()
+                .setUsername(username)
+                .setPassword(password)
+                .setRoles(Collections.singletonList(role))
+                .build();
+
+        UserValidator userValidator = new UserValidator(user);
+
+        boolean userValid = userValidator.validate();
+
+
+        if (!userValid){
+            userValidator.getErrors().forEach(userRegisterNotification::addError);
+            userRegisterNotification.setResult(Boolean.FALSE);
+        } else {
+            user.setPassword(hashPassword(password));
+            userRegisterNotification.setResult(userRepository.save(user));
+        }
+
+        return userRegisterNotification;
+
+    }
+
+    @Override
     public Notification<User> login(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, hashPassword(password));
     }
@@ -65,6 +99,11 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     @Override
     public boolean logout(User user) {
         return false;
+    }
+
+    @Override
+    public boolean deleteUser(User user) {
+        return userRepository.deleteUser(user);
     }
 
     private String hashPassword(String password) {

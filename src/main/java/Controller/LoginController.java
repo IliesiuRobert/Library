@@ -1,5 +1,6 @@
 package Controller;
 
+import Launcher.AdminComponentFactory;
 import Launcher.EmployeeComponentFactory;
 import Launcher.LoginComponentFactory;
 import Model.User;
@@ -8,6 +9,8 @@ import Service.User.AuthenticationService;
 import View.LoginView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
+import static Database.Constants.Roles.ADMINISTRATOR;
 
 public class LoginController {
 
@@ -34,9 +37,17 @@ public class LoginController {
 
             if (loginNotification.hasErrors()){
                 loginView.setActionTargetText(loginNotification.getFormattedErrors());
-            }else{
+            } else {
+                User loggedIn = loginNotification.getResult();
                 loginView.setActionTargetText("LogIn Successfull!");
-                EmployeeComponentFactory.getInstance(LoginComponentFactory.getComponentsForTests(), LoginComponentFactory.getStage());
+                boolean isAdmin = loggedIn.getRoles().stream()
+                        .anyMatch(role -> ADMINISTRATOR.equals(role.getRole()));
+
+                if (isAdmin) {
+                    AdminComponentFactory.getInstance(LoginComponentFactory.getComponentsForTests(), LoginComponentFactory.getStage());
+                } else {
+                    EmployeeComponentFactory.getInstance(LoginComponentFactory.getComponentsForTests(), LoginComponentFactory.getStage());
+                }
             }
         }
     }
