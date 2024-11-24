@@ -37,7 +37,7 @@ public class BookController {
             Integer amount = bookView.getAmount();
             Double price = bookView.getPrice();
 
-            if (title.isEmpty() || author.isEmpty()){
+            if (title.isEmpty() || author.isEmpty() || amount <= 0 || price <= 0){
                 bookView.displayAlertMessage("Save Error", "Problem at Title or Author fields", "Can not have empty Author or Title fields. Please fill in the fields before submitting Save!");
                 bookView.getBooksObservableList().get(0).setTitle("No Name");
             } else {
@@ -102,30 +102,35 @@ public class BookController {
                     BookDTO bookDTO = BookMapper.convertBookToBookDTO(book);
 
                     int newAmount = bookDTO.getAmount() - quantity;
-                    boolean actionModifiy = bookService.updateAmount(bookDTO.getTitle(), newAmount, quantity, bookDTO.getPrice() * quantity);
+                    if (newAmount < 0) {
+                        bookView.displayAlertMessage("Sale Error", "Sale was not procesed", "You sold more books than the quantity");
+                    }
+                    else {
+                        boolean actionModifiy = bookService.updateAmount(bookDTO.getTitle(), newAmount, quantity, bookDTO.getPrice() * quantity);
 
-                    SaleDTO saleDTO = new SaleDTOBuilder()
-                            .setBookTitle(bookTitle)
-                            .setQuantity(quantity)
-                            .setTotalPrice(quantity * bookDTO.getPrice())
-                            .build();
+                        SaleDTO saleDTO = new SaleDTOBuilder()
+                                .setBookTitle(bookTitle)
+                                .setQuantity(quantity)
+                                .setTotalPrice(quantity * bookDTO.getPrice())
+                                .build();
 
-                    bookView.addSaleToObservableList(saleDTO);
+                        bookView.addSaleToObservableList(saleDTO);
 
-                    if (actionModifiy) {
-                        bookView.displayAlertMessage("Order Finish", "Order was procesed", "Order was procesesd from database.");
-                        bookDTO.setAmount(newAmount);
-                        bookView.updateBookToObservabileList(bookDTO);
+                        if (actionModifiy) {
+                            bookView.displayAlertMessage("Order Finish", "Order was procesed", "Order was procesesd from database.");
+                            bookDTO.setAmount(newAmount);
+                            bookView.updateBookToObservabileList(bookDTO);
 
-                        if (bookDTO.getAmount() == 0) {
-                            boolean succ = bookService.delete(BookMapper.convertBookDTOToBook(bookDTO));
-                            if (succ) {
-                                bookView.displayAlertMessage("Book eliminated", "Book Deleted", "Book was deleted from database because of amount value (amount = 0)!");
-                                bookView.removeBookFromObservableList(bookDTO);
+                            if (bookDTO.getAmount() == 0) {
+                                boolean succ = bookService.delete(BookMapper.convertBookDTOToBook(bookDTO));
+                                if (succ) {
+                                    bookView.displayAlertMessage("Book eliminated", "Book Deleted", "Book was deleted from database because of amount value (amount = 0)!");
+                                    bookView.removeBookFromObservableList(bookDTO);
+                                }
                             }
+                        } else {
+                            bookView.displayAlertMessage("Order Error", "Order was not procesed", "There was a problem in the book process. Please restart the application and try again!");
                         }
-                    } else {
-                        bookView.displayAlertMessage("Order Error", "Order was not procesed", "There was a problem in the book process. Please restart the application and try again!");
                     }
                 } else {
                     bookView.displayAlertMessage("Order Error", "Book not found", "Book was not fount in database.");

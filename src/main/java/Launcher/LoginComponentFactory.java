@@ -25,11 +25,15 @@ public class LoginComponentFactory {
     private static Boolean componentsForTests;
     private static Stage stage;
 
-    public static synchronized LoginComponentFactory getInstance(Boolean aComponentsForTests, Stage aStage) {
+    public static LoginComponentFactory getInstance(Boolean aComponentsForTests, Stage aStage) {
         if (instance == null) {
-            componentsForTests = aComponentsForTests;
-            stage = aStage;
-            instance = new LoginComponentFactory(componentsForTests, stage);
+            synchronized (LoginComponentFactory.class) {
+                if (instance == null) {
+                    componentsForTests = aComponentsForTests;
+                    stage = aStage;
+                    instance = new LoginComponentFactory(componentsForTests, stage);
+                }
+            }
         }
 
         return instance;

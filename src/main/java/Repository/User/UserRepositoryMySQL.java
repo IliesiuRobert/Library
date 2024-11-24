@@ -69,6 +69,7 @@ public class UserRepositoryMySQL implements UserRepository {
             if (userResultSet.next())
             {
                 User user = new UserBuilder()
+                        .setId(userResultSet.getLong("id"))
                         .setUsername(userResultSet.getString("username"))
                         .setPassword(userResultSet.getString("password"))
                         .setRoles(rightsRolesRepository.findRolesForUser(userResultSet.getLong("id")))
@@ -77,7 +78,7 @@ public class UserRepositoryMySQL implements UserRepository {
                 findByUsernameAndPasswordNotification.setResult(user);
             } else {
                 findByUsernameAndPasswordNotification.addError("Invalid username or password!");
-                return findByUsernameAndPasswordNotification;
+                //return findByUsernameAndPasswordNotification;
             }
 
         } catch (SQLException e) {
@@ -122,6 +123,24 @@ public class UserRepositoryMySQL implements UserRepository {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public boolean deleteUser(User user) {
+        String newSql = "DELETE FROM user WHERE username = ?";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(newSql);
+            preparedStatement.setString(1, user.getUsername());
+
+            preparedStatement.executeUpdate();
+
+            return true;
+        } catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     // repara concatenarea de string-uri
     @Override
