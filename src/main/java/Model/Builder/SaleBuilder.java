@@ -30,6 +30,16 @@ public class SaleBuilder {
         return this;
     }
 
+    public SaleBuilder setTimesTamp(String timesTamp) {
+        sale.setTimesTamp(timesTamp);
+        return this;
+    }
+
+    public SaleBuilder setUserId(long userId) {
+        sale.setUserId(userId);
+        return this;
+    }
+
     public Sale build() {
         return sale;
     }

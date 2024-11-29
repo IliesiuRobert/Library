@@ -5,6 +5,8 @@ public class Sale {
     private String bookTitle;
     private int quantity;
     private double price;
+    private String timesTamp;
+    private long userId;
 
     public long getId() {
         return id;
@@ -36,6 +38,22 @@ public class Sale {
 
     public void setBookTitle(String bookTitle) {
         this.bookTitle = bookTitle;
+    }
+
+    public String getTimesTamp() {
+        return timesTamp;
+    }
+
+    public void setTimesTamp(String timesTamp) {
+        this.timesTamp = timesTamp;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     @Override

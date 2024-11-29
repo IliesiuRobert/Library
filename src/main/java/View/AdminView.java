@@ -107,7 +107,13 @@ public class AdminView {
         TableColumn<SaleDTO, Number> totalPriceColumn = new TableColumn<SaleDTO, Number>("Total price");
         totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        saleTableView.getColumns().addAll(bookTitleColumn, quantityColumn, totalPriceColumn);
+        TableColumn<SaleDTO, String> timesTampColumn = new TableColumn<SaleDTO, String>("TimesTamp");
+        timesTampColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
+
+        TableColumn<SaleDTO, Number> userIdColumn = new TableColumn<SaleDTO, Number>("User ID");
+        userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
+
+        saleTableView.getColumns().addAll(bookTitleColumn, quantityColumn, totalPriceColumn, timesTampColumn, userIdColumn);
 
         saleTableView.setItems(saleObservableList);
 

@@ -3,6 +3,8 @@ package Controller;
 import Mapper.BookMapper;
 import Mapper.UserMapper;
 import Model.Book;
+import Model.Session;
+import Model.User;
 import Model.Validator.Notification;
 import Service.Book.BookService;
 import Service.PDF.PDFService;
@@ -19,6 +21,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AdminController {
@@ -124,12 +128,20 @@ public class AdminController {
                         adminView.displayAlertMessage("Sale Error", "Sale was not procesed", "You sold more books than the quantity");
                     }
                     else {
+                        Long idUser = Session.getLoggedInUserID();
+
+                        LocalDate currentDate = LocalDate.now();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                        String formattedDate = currentDate.format(formatter);
+
                         boolean actionModifiy = bookService.updateAmount(bookDTO.getTitle(), newAmount, quantity, bookDTO.getPrice() * quantity);
 
                         SaleDTO saleDTO = new SaleDTOBuilder()
                                 .setBookTitle(bookTitle)
                                 .setQuantity(quantity)
                                 .setTotalPrice(quantity * bookDTO.getPrice())
+                                .setTimpsTamp(formattedDate)
+                                .setUserId(idUser)
                                 .build();
 
                         adminView.addSaleToObservableList(saleDTO);

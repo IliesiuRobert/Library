@@ -66,6 +66,8 @@ public class JDBConnectionWrapper {
                 " title varchar(500) NOT NULL," +
                 " quantity INTEGER DEFAULT 0," +
                 " price DECIMAL(10, 2) DEFAULT 0.0," +
+                " timestamp varchar(500) NOT NULL," +
+                " userId INTEGER DEFAULT 0," +
                 " PRIMARY KEY(id)," +
                 " UNIQUE KEY id_UNIQUE(id)" +
                 ") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;";
