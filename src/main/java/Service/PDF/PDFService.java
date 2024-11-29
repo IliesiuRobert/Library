@@ -22,26 +22,41 @@ public class PDFService {
                     .setFontSize(18)
                     .setMarginBottom(20));
 
-            float[] columnWidths = {100, 50, 100, 100, 50};
-            Table table = new Table(columnWidths);
+            Map<Long, List<SaleDTO>> salesByEmployeeId = new HashMap<>();
 
-            table.addCell(new Paragraph("Title"));
-            table.addCell(new Paragraph("Quantity"));
-            table.addCell(new Paragraph("Total Price"));
-            table.addCell(new Paragraph("Date"));
-            table.addCell(new Paragraph("Employee ID"));
-
-            for (SaleDTO sale : sales) {
-                table.addCell(sale.getBookTitle());
-                table.addCell(String.valueOf(sale.getQuantity()));
-                table.addCell(String.valueOf(sale.getTotalPrice()));
-                table.addCell(sale.getTimestamp());
-                table.addCell(String.valueOf(sale.getUserId()));
+            for (SaleDTO saleDTO : sales) {
+                salesByEmployeeId.computeIfAbsent(saleDTO.getUserId(), k -> new ArrayList<>()).add(saleDTO);
             }
 
-            document.add(table);
-            document.close();
+            for (Map.Entry<Long, List<SaleDTO>> entry : salesByEmployeeId.entrySet()) {
+                Long userId = entry.getKey();
+                List<SaleDTO> employeeSales = entry.getValue();
 
+                document.add(new Paragraph("Employee ID: " + userId)
+                        .setBold()
+                        .setFontSize(14)
+                        .setMarginTop(20)
+                        .setMarginBottom(10));
+
+                float[] columnWidths = {100, 50, 100, 100};
+                Table table = new Table(columnWidths);
+
+                table.addCell(new Paragraph("Title"));
+                table.addCell(new Paragraph("Quantity"));
+                table.addCell(new Paragraph("Total Price"));
+                table.addCell(new Paragraph("Date"));
+
+                for (SaleDTO sale : employeeSales) {
+                    table.addCell(sale.getBookTitle());
+                    table.addCell(String.valueOf(sale.getQuantity()));
+                    table.addCell(String.valueOf(sale.getTotalPrice()));
+                    table.addCell(sale.getTimestamp());
+                }
+
+                document.add(table);
+            }
+
+            document.close();
             System.out.println("PDF was generated at " + filePath);
         } catch (Exception e)
         {
