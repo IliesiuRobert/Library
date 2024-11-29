@@ -3,6 +3,7 @@ package Controller;
 import Launcher.AdminComponentFactory;
 import Launcher.EmployeeComponentFactory;
 import Launcher.LoginComponentFactory;
+import Model.Session;
 import Model.User;
 import Model.Validator.Notification;
 import Service.User.AuthenticationService;
@@ -40,6 +41,9 @@ public class LoginController {
             } else {
                 User loggedIn = loginNotification.getResult();
                 loginView.setActionTargetText("LogIn Successfull!");
+
+                Session.setLoggedInUser(loggedIn.getId());
+
                 boolean isAdmin = loggedIn.getRoles().stream()
                         .anyMatch(role -> ADMINISTRATOR.equals(role.getRole()));
 

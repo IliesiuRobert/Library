@@ -22,17 +22,21 @@ public class PDFService {
                     .setFontSize(18)
                     .setMarginBottom(20));
 
-            float[] columnWidths = {100, 50, 100};
+            float[] columnWidths = {100, 50, 100, 100, 50};
             Table table = new Table(columnWidths);
 
             table.addCell(new Paragraph("Title"));
             table.addCell(new Paragraph("Quantity"));
             table.addCell(new Paragraph("Total Price"));
+            table.addCell(new Paragraph("Date"));
+            table.addCell(new Paragraph("Employee ID"));
 
             for (SaleDTO sale : sales) {
                 table.addCell(sale.getBookTitle());
                 table.addCell(String.valueOf(sale.getQuantity()));
                 table.addCell(String.valueOf(sale.getTotalPrice()));
+                table.addCell(sale.getTimestamp());
+                table.addCell(String.valueOf(sale.getUserId()));
             }
 
             document.add(table);

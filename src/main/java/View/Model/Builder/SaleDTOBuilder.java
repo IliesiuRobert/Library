@@ -24,7 +24,18 @@ public class SaleDTOBuilder {
         return this;
     }
 
+    public SaleDTOBuilder setTimpsTamp(String timpsTamp) {
+        saleDTO.setTimestamp(timpsTamp);
+        return this;
+    }
+
+    public SaleDTOBuilder setUserId(Long userId) {
+        saleDTO.setUserId(userId);
+        return this;
+    }
+
     public SaleDTO build() {
         return saleDTO;
     }
+
 }

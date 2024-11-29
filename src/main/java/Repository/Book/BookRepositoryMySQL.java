@@ -2,9 +2,13 @@ package Repository.Book;
 
 import Model.Book;
 import Model.Sale;
+import Model.Session;
+import Model.User;
 
 import java.sql.*;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.util.Optional;
@@ -157,7 +161,7 @@ public class BookRepositoryMySQL implements BookRepository {
     @Override
     public boolean updateAmount(String title, int newAmount, int quantity, double price) {
         String sql = "UPDATE book SET amount = ? WHERE title = ?";
-        String newsql = "INSERT INTO sale VALUES(null,?,?,?);";
+        String newsql = "INSERT INTO sale VALUES(null,?,?,?,?,?);";
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -170,6 +174,14 @@ public class BookRepositoryMySQL implements BookRepository {
             preparedStatement1.setString(1, title);
             preparedStatement1.setInt(2, quantity);
             preparedStatement1.setDouble(3, price);
+
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            String formattedDate = currentDate.format(formatter);
+            preparedStatement1.setString(4, formattedDate);
+
+            Long idUser = Session.getLoggedInUserID();
+            preparedStatement1.setLong(5, idUser);
 
             int rowsUpdated1 = preparedStatement1.executeUpdate();
 
@@ -195,6 +207,8 @@ public class BookRepositoryMySQL implements BookRepository {
                 String booktitle = resultSet.getString("title");
                 int quantity = resultSet.getInt("quantity");
                 double price = resultSet.getDouble("price");
+                String date = resultSet.getString("timestamp");
+                Long userID = resultSet.getLong("userId");
 
                 Sale sale = new Sale();
 
@@ -202,6 +216,8 @@ public class BookRepositoryMySQL implements BookRepository {
                 sale.setBookTitle(booktitle);
                 sale.setQuantity(quantity);
                 sale.setTotalPrice(price);
+                sale.setTimesTamp(date);
+                sale.setUserId(userID);
 
                 sales.add(sale);
             }

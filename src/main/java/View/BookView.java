@@ -95,7 +95,10 @@ public class BookView {
         TableColumn<SaleDTO, Number> totalPriceColumn = new TableColumn<SaleDTO, Number>("Total price");
         totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        saleTableView.getColumns().addAll(bookTitleColumn, quantityColumn, totalPriceColumn);
+        TableColumn<SaleDTO, String> timesTampColumn = new TableColumn<SaleDTO, String>("TimesTamp");
+        timesTampColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
+
+        saleTableView.getColumns().addAll(bookTitleColumn, quantityColumn, totalPriceColumn, timesTampColumn);
 
         saleTableView.setItems(saleObservableList);
 
