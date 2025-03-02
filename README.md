@@ -32,13 +32,13 @@ Key Features & Modules:
   &ensp;* User Roles: Supports Admin, Employee and Customer roles with different permissions.  
   &ensp;* Caching System: Implements caching for book retrieval to optimize performance.  
 
-Technologies Used:  
-  &ensp;* Java (JDK 8+)
-  &ensp;* Gradle (for build automation)
-  &ensp;* JavaFX (for GUI)
-  &ensp;* JDBC (for database connectivity)
-  &ensp;* MySQL (as the database)
-  &ensp;* PDF Generation (for report creation)
+Technologies Used:    
+  &ensp;* Java (JDK 8+)  
+  &ensp;* Gradle (for build automation)  
+  &ensp;* JavaFX (for GUI)  
+  &ensp;* JDBC (for database connectivity)  
+  &ensp;* MySQL (as the database)  
+  &ensp;* PDF Generation (for report creation)  
 
 This Library Management System is a structured Java application that enables book and user management, authentication, and report generation. With its modular MVC-based design, it provides scalability, maintainability, and efficiency in managing library operations.
 
